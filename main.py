@@ -17,5 +17,9 @@ async def webhook(request: Request, x_hub_signature: str = Header(None)):
     # Process the webhook event
     return {"status": "Webhook received successfully"}
 
+@app.get("/")
+async def root():
+    return {"message": "Hello, Vercel!"}
+
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
