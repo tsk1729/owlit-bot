@@ -44,5 +44,17 @@ async def privacy_policy():
     return HTMLResponse(content=html_content)
 
 
+@app.get("/terms-of-service", response_class=HTMLResponse)
+async def terms_of_service():
+    # Path to the terms_of_service.html file
+    file_path = os.path.join(os.path.dirname(__file__), "terms_of_service.html")
+
+    # Open and read the HTML file
+    with open(file_path, "r", encoding="utf-8") as file:
+        html_content = file.read()
+
+    # Return the HTML content as a response
+    return HTMLResponse(content=html_content)
+
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
