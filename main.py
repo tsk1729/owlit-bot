@@ -1,15 +1,17 @@
 import uvicorn
 from fastapi import FastAPI, Header, HTTPException, Request
+import os
 from fastapi.responses import JSONResponse
 
 app = FastAPI()
 
-# The verification token you set in the Facebook App Dashboard
-VERIFY_TOKEN = "your_verify_token_here"  # This should be the same as what you use in the webhook config
+# Retrieve the token and app_secret from environment variables
+APP_SECRET = os.getenv("APP_SECRET")  # For validating x_hub_signature
+VERIFY_TOKEN = os.getenv("TOKEN")  # For validating the webhook verification request
 
 @app.get("/webhook")
 async def verify_webhook(hub_mode: str, hub_verify_token: str, hub_challenge: str):
-    # Check the verify token matches the one set in Facebook App Dashboard
+    # Check if the verify token matches the one set in Facebook App Dashboard
     if hub_verify_token == VERIFY_TOKEN:
         return JSONResponse(content={"hub.challenge": hub_challenge})
     else:
@@ -21,9 +23,9 @@ async def webhook(request: Request, x_hub_signature: str = Header(None)):
     data = await request.json()
     print("Received webhook data:", data)
 
-    # Verify using the token (replace 'your_token_here' with your actual token)
-    if x_hub_signature != "your_token_here":
-        raise HTTPException(status_code=403, detail="Invalid token")
+    # Verify using the app secret for x_hub_signature
+    if x_hub_signature != APP_SECRET:
+        raise HTTPException(status_code=403, detail="Invalid signature")
 
     # Process the webhook event
     return {"status": "Webhook received successfully"}
